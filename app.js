@@ -4,8 +4,8 @@ const serv = require('./ws_crud_pg')
 
 app.use(express.json()); // parse json body content
 
-app.get('api/', (req, res) => {
-    res.status(200).json('cool');
+app.get('/api', (req, res) => {
+    res.json('cool');
 })
 
 app.post('/api/masks', (req, res) => {
