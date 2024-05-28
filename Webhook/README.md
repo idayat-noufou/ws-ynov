@@ -1,4 +1,4 @@
-## Telegram Webhook API ##
+## Webhook API Telegram ##
 
 Ce projet est une API Webhook simple utilisant Node.js et Express pour recevoir des messages de Telegram. Le bot utilise la bibliothèque `node-telegram-bot-api` pour interagir avec l'API Telegram.
 
