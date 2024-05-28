@@ -69,40 +69,47 @@ function getLatestMaskId() {
     const client = new pg.Client(config);
     const sql = `SELECT MAX(id) FROM ws_masks;`;
     let id = -1;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
-            if (err)
-                throw err;
-            id = result.rows[0].max;
-            // console.log(result.rows);
-            client.end(function (err) {
-                if (err)
-                    throw err;
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
+            if (err) {
+                client.end();
+                reject(err);
+            }
+            client.query(sql, [], function (err, result) {
+                if (err) {
+                    client.end();
+                    reject(err);
+                }
+                id = result.rows[0].max;
+                client.end(function (err) {
+                    if (err) {
+                        client.end();
+                        reject(err);
+                    }
+                });
+                resolve(id);
             });
-            return id;
         });
-        console.log(id)
     });
-    return id;
 }
 
 function getLatestEntryId() {
     const client = new pg.Client(config);
     const sql = `SELECT MAX(id) FROM ws_entries;`;
     let id = -1;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
                 throw err;
-            id = result.rows[0].max;
-            console.log(result.rows);
-            client.end(function (err) {
+            client.query(sql, [], function (err, result) {
                 if (err)
                     throw err;
+                id = result.rows[0].max;
+                console.log(result.rows);
+                client.end(function (err) {
+                    if (err)
+                        throw err;
+                });
             });
         });
     });
@@ -113,77 +120,81 @@ function getLatestEntryId() {
 function getAllMasks() {
     const client = new pg.Client(config);
     const sql = `SELECT * FROM ws_masks;`;
-    let dataf = [];
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
                 throw err;
-            client.end(function (err) {
+            client.query(sql, [], function (err, result) {
                 if (err)
                     throw err;
+                client.end(function (err) {
+                    if (err)
+                        throw err;
+                });
+                resolve(result.rows);
             });
-            return result.rows;
-        }).then((data) => {datac=data;});
-        datac= [];
-    }).then((data) => {dataf=data;});
-    console.log(dataf)
-    return dataf;
+        });
+    });
 }
 
 function getAllEntries() {
     const client = new pg.Client(config);
     const sql = `SELECT * FROM ws_entries;`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
                 throw err;
+            client.query(sql, [], function (err, result) {
+                if (err)
+                    throw err;
 
-            console.log(result.rows);
-            client.end(function (err) {
+                console.log(result.rows);
+                client.end(function (err) {
                 if (err)
                     throw err;
             });
         });
+    });
     });
 }
 
 function createMask(id, name, description, mask_json) {
     const client = new pg.Client(config);
     const sql = `INSERT INTO ws_masks (id,name, description, mask_json) VALUES (${id},'${name}', '${description}', '${mask_json}');`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
                 throw err;
-
-            console.log("succès");
-            client.end(function (err) {
+            client.query(sql, [], function (err, result) {
                 if (err)
                     throw err;
+
+                console.log("succès");
+                client.end(function (err) {
+                    if (err)
+                        throw err;
             });
         });
+    });
     });
 }
 
 function createEntry(id, mask_id, entry_json) {
     const client = new pg.Client(config);
     const sql = `INSERT INTO ws_entries (id, mask_id, entry_json) VALUES (${id},${mask_id}, '${entry_json}');`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
                 throw err;
-
-            console.log("succès");
-            client.end(function (err) {
+            client.query(sql, [], function (err, result) {
                 if (err)
                     throw err;
+
+                console.log("succès");
+                client.end(function (err) {
+                    if (err)
+                        throw err;
+                });
             });
         });
     });
@@ -191,18 +202,20 @@ function createEntry(id, mask_id, entry_json) {
 
 function readMasks(id) {
     const client = new pg.Client(config);
-    const sql = `SELECT * FROM ws_masks WHERE id=`+id+`;`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    const sql = `SELECT * FROM ws_masks WHERE id=` + id + `;`;
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
+                throw err;
+            client.query(sql, [], function (err, result) {
+                if (err)
                 throw err;
 
             console.log(result.rows);
             client.end(function (err) {
                 if (err)
                     throw err;
+            });
             });
         });
     });
@@ -210,11 +223,12 @@ function readMasks(id) {
 
 function readEntries(id) {
     const client = new pg.Client(config);
-    const sql = `SELECT * FROM ws_entries WHERE id=`+id+`;`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    const sql = `SELECT * FROM ws_entries WHERE id=` + id + `;`;
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
+            if (err)
+                throw err;
+            client.query(sql, [], function (err, result) {
             if (err)
                 throw err;
 
@@ -225,15 +239,17 @@ function readEntries(id) {
             });
         });
     });
+    });
 }
 
 function updateMask(id, name, description, mask_json) {
     const client = new pg.Client(config);
     const sql = `UPDATE ws_masks SET name = '${name}', description = '${description}', mask_json = '${mask_json}' WHERE id = ${id};`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
+            if (err)
+                throw err;
+            client.query(sql, [], function (err, result) {
             if (err)
                 throw err;
 
@@ -243,18 +259,20 @@ function updateMask(id, name, description, mask_json) {
                     throw err;
             });
         });
+    });
     });
 }
 
 function updateEntry(id, mask_id, entry_json) {
     const client = new pg.Client(config);
     const sql = `UPDATE ws_entries SET mask_id = ${mask_id}, entry_json = '${entry_json}' WHERE id = ${id};`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
                 throw err;
+            client.query(sql, [], function (err, result) {
+                if (err)
+                    throw err;
 
             console.log("succès");
             client.end(function (err) {
@@ -262,44 +280,49 @@ function updateEntry(id, mask_id, entry_json) {
                     throw err;
             });
         });
+    });
     });
 }
 
 function deleteMask(id) {
     const client = new pg.Client(config);
     const sql = `DELETE FROM ws_masks WHERE id = ${id};`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
                 throw err;
+            client.query(sql, [], function (err, result) {
+                if (err)
+                    throw err;
 
-            console.log("succès");
-            client.end(function (err) {
+                console.log("succès");
+                client.end(function (err) {
                 if (err)
                     throw err;
             });
         });
+    });
     });
 }
 
 function deleteEntry(id) {
     const client = new pg.Client(config);
     const sql = `DELETE FROM ws_entries WHERE id = ${id};`;
-    client.connect(function (err) {
-        if (err)
-            throw err;
-        client.query(sql, [], function (err, result) {
+    return new Promise((resolve, reject) => {
+        client.connect(function (err) {
             if (err)
                 throw err;
+            client.query(sql, [], function (err, result) {
+                if (err)
+                    throw err;
 
-            console.log("succès");
+                console.log("succès");
             client.end(function (err) {
                 if (err)
                     throw err;
             });
         });
+    });
     });
 }
 
@@ -312,11 +335,11 @@ function mainTest() {
     // updateEntry(4, 1, '{"entry4b": "entry4b"}');
     // deleteMask(4);
     // deleteEntry(4);
-    getLatestMaskId();
+    getLatestMaskId().then((id)=>{console.log(id)}).catch((err)=>{console.log(err)});
     // getLatestEntryId();
 }
 
-module.exports= {
+module.exports = {
     createMask,
     createEntry,
     readMasks,

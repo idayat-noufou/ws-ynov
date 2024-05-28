@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const serv = require('./ws_crud_pg')
+const serv = require('../ws_crud_pg')
 
 app.use(express.json()); // parse json body content
 
