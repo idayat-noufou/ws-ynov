@@ -14,7 +14,7 @@ RUN npm install
 COPY . /app
 
 # Commande pour exécuter notre application, qui est index.js.
-CMD node app.js
+CMD node restAPI/app.js
 
 # Exposition du port sur lequel notre application s'exécute, à savoir le port 3000.
 EXPOSE 3000
